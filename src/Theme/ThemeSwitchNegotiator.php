@@ -25,8 +25,17 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
     // In order to get the $route you probably should use the $route_match.
     $route = \Drupal::routeMatch()->getRouteObject();
     $is_admin_route = \Drupal::service('router.admin_context')->isAdminRoute($route);
-
+    $switchTheme = FALSE;
     if ($is_admin_route == FALSE) {
+      $switchTheme = TRUE;
+    }
+    else {
+      $currentUser = \Drupal::currentUser();
+      if (!in_array("administrator", $currentUser->getRoles())) {
+        $switchTheme = TRUE;
+      }
+    }
+    if ($switchTheme == TRUE) {
       $negotiator = \Drupal::service('domain.negotiator');
       $domain = $negotiator->getActiveDomain();
       $doaminThemes = array_filter(unserialize(\Drupal::state()->get('domainthemes')));
