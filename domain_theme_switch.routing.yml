@@ -6,4 +6,3 @@ domain_theme_switch.admin:
     _title_context: 'With modules'
   requirements:
     _permission: 'administer domains'
-
