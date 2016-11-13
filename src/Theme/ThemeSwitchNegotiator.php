@@ -10,6 +10,9 @@ use Drupal\Core\Theme\ThemeNegotiatorInterface;
  */
 class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
 
+  // protected theme variable to set the default theme if no theme is selected.
+  protected $theme = 'bartik';
+
   /**
    * Whether this theme negotiator should be used to set the theme.
    *
@@ -21,28 +24,25 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    *   decide.
    */
   public function applies(RouteMatchInterface $route_match) {
-
-    // In order to get the $route you probably should use the $route_match.
+    $switchTheme = TRUE;
     $route = \Drupal::routeMatch()->getRouteObject();
     $is_admin_route = \Drupal::service('router.admin_context')->isAdminRoute($route);
-    $switchTheme = FALSE;
-    if ($is_admin_route == FALSE) {
-      $switchTheme = TRUE;
+    $current_user = \Drupal::currentUser();
+    $user_roles = $current_user->getRoles();
+    $has_admin_role = FALSE;
+    if (in_array("administrator", $user_roles)) {
+      $has_admin_role = TRUE;
     }
-    else {
-      $currentUser = \Drupal::currentUser();
-      if (!in_array("administrator", $currentUser->getRoles())) {
-        $switchTheme = TRUE;
-      }
+    if ($is_admin_route === TRUE && $has_admin_role === TRUE) {
+      $switchTheme = FALSE;
     }
-    if ($switchTheme == TRUE) {
-      $negotiator = \Drupal::service('domain.negotiator');
-      $domain = $negotiator->getActiveDomain();
-      $doaminThemes = array_filter(unserialize(\Drupal::state()->get('domainthemes')));
-      if (array_key_exists($domain->id(), $doaminThemes)) {
-        return TRUE;
-      }
+    $negotiator = \Drupal::service('domain.negotiator');
+    $domain = $negotiator->getActiveDomain();
+    $config = \Drupal::config("domain_theme_switch.DomainThemeSwitchConfig");
+    if ($config->get($domain->id()) != NULL) {
+      $this->theme = $config->get($domain->id());
     }
+    return $switchTheme;
   }
 
   /**
@@ -56,14 +56,7 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    *   default one, should be used instead.
    */
   public function determineActiveTheme(RouteMatchInterface $route_match) {
-    $negotiator = \Drupal::service('domain.negotiator');
-    $domain = $negotiator->getActiveDomain();
-    $doaminThemes = array_filter(unserialize(\Drupal::state()->get('domainthemes')));
-    $domainThemeFlag = NULL;
-    if (array_key_exists($domain->id(), $doaminThemes)) {
-      $domainThemeFlag = TRUE;
-      return $doaminThemes[$domain->id()];
-    }
+    return $this->theme;
   }
 
 }
