@@ -11,7 +11,7 @@ use Drupal\Core\Theme\ThemeNegotiatorInterface;
 class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
 
   // protected theme variable to set the default theme if no theme is selected.
-  protected $theme = 'bartik';
+  protected $theme = NULL;
 
   /**
    * Whether this theme negotiator should be used to set the theme.
@@ -38,9 +38,9 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
     }
     $negotiator = \Drupal::service('domain.negotiator');
     $domain = $negotiator->getActiveDomain();
-    $config = \Drupal::config("domain_theme_switch.DomainThemeSwitchConfig");
-    if ($config->get($domain->id()) != NULL) {
-      $this->theme = $config->get($domain->id());
+    if ($domain != NULL) {
+      $config = \Drupal::config("domain_theme_switch.DomainThemeSwitchConfig");
+      $this->theme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id()) : NULL;
     }
     return $switchTheme;
   }

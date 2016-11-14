@@ -4,6 +4,7 @@ namespace Drupal\domain_theme_switch\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Class DomainThemeSwitchConfigForm.
@@ -53,6 +54,13 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
         '#options' => $themeNames,
         '#default_value' => $config->get($key),
       ];
+    }
+    if (count($all_domain) === 0) {
+      $add_link = \Drupal::l(t('here'), Url::fromRoute('domain.admin'));
+      $form['contact_information'] = array(
+        '#markup' =>  t("Unable to find the domain record please click $add_link to create the domain first."),
+      );
+      return $form;
     }
     return parent::buildForm($form, $form_state);
   }
