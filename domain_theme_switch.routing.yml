@@ -1,9 +1,7 @@
-domain_theme_switch.domain_theme_switch_config_form:
+domain_theme_switch.settings:
   path: '/admin/config/domain/domain_theme_switch/config'
   defaults:
     _form: '\Drupal\domain_theme_switch\Form\DomainThemeSwitchConfigForm'
-    _title: 'Domain Theme Configuration'
+    _title: 'Domain theme configuration'
   requirements:
-    _permission: 'access administration pages'
-  options:
-    _admin_route: TRUE
+    _permission: 'administer domains'

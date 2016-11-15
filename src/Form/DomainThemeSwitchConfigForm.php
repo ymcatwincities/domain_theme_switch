@@ -46,7 +46,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
     foreach ($all_domain as $key => $value) {
       $form['domain' . $key] = array(
         '#type' => 'fieldset',
-        '#title' => t("Select Theme for @domain_name",array('@domain_name'=>$value)), 
+        '#title' => t('Select Theme for @domain_name', array('@domain_name' => $value))
       );
       $form['domain' . $key][$key] = [
         '#type' => 'select',
@@ -57,7 +57,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
     }
     if (count($all_domain) === 0) {
       $form['domain_theme_switch_message'] = array(
-        '#markup' =>  t("We did not find any domain records please @link to create the domain.",array('@link'=>\Drupal::l(t('click here'), Url::fromRoute('domain.admin')))),
+        '#markup' => t('We did not find any domain records please @link to create the domain.', array('@link' => \Drupal::l(t('click here'), Url::fromRoute('domain.admin')))),
       );
       return $form;
     }

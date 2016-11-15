@@ -5,3 +5,4 @@ package: Domain
 core: 8.x
 dependencies:
   - domain
+configure: domain_theme_switch.settings

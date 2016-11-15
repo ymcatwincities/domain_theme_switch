@@ -39,7 +39,7 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
     $negotiator = \Drupal::service('domain.negotiator');
     $domain = $negotiator->getActiveDomain();
     if ($domain != NULL) {
-      $config = \Drupal::config("domain_theme_switch.DomainThemeSwitchConfig");
+      $config = \Drupal::config('domain_theme_switch.DomainThemeSwitchConfig');
       $this->theme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id()) : NULL;
     }
     return $switchTheme;
