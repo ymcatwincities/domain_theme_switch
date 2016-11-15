@@ -1,0 +1,17 @@
+<?php
+
+use Drupal\Core\Url;
+use Drupal\domain\DomainInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Component\Utility\Html;
+
+/**
+ * Implements hook_help().
+ */
+function domain_theme_switch_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'domain_theme_switch.domain_theme_switch_config_form':
+      $output = t('<p>Find the list of domains and the selected theme against them. You may select the theme corresponding to each domain and if you leave them blank then default theme will load.</p>');
+      return $output;
+  }
+}

@@ -1,0 +1,4 @@
+domain_theme_switch.admin:
+  title: Domain Theme
+  route_name: domain_theme_switch.domain_theme_switch_config_form
+  base_route: domain.admin
