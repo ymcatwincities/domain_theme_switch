@@ -24,7 +24,7 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    *   decide.
    */
   public function applies(RouteMatchInterface $route_match) {
-    $switchTheme = TRUE;
+    $switch_theme = TRUE;
     $route = \Drupal::routeMatch()->getRouteObject();
     $is_admin_route = \Drupal::service('router.admin_context')->isAdminRoute($route);
     $current_user = \Drupal::currentUser();
@@ -34,7 +34,7 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
       $has_admin_role = TRUE;
     }
     if ($is_admin_route === TRUE && $has_admin_role === TRUE) {
-      $switchTheme = FALSE;
+      $switch_theme = FALSE;
     }
     $negotiator = \Drupal::service('domain.negotiator');
     $domain = $negotiator->getActiveDomain();
@@ -42,7 +42,7 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
       $config = \Drupal::config('domain_theme_switch.DomainThemeSwitchConfig');
       $this->theme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id()) : NULL;
     }
-    return $switchTheme;
+    return $switch_theme;
   }
 
   /**
