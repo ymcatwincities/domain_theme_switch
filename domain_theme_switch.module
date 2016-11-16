@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Domain theme Switcher.
+ */
 
 use Drupal\Core\Routing\RouteMatchInterface;
 

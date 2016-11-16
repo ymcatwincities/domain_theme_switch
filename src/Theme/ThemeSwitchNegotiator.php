@@ -10,7 +10,7 @@ use Drupal\Core\Theme\ThemeNegotiatorInterface;
  */
 class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
 
-  // protected theme variable to set the default theme if no theme is selected.
+  // Protected theme variable to set the default theme if no theme is selected.
   protected $theme = NULL;
 
   /**

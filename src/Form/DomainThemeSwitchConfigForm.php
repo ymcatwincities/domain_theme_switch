@@ -69,7 +69,6 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    *
    * @param array $form
    *   Form items.
-   *
    * @param FormStateInterface $form_state
    *   Formstate for validate.
    */
