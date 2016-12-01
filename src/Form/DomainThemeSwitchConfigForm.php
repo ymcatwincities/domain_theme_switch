@@ -18,7 +18,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'domain_theme_switch.DomainThemeSwitchConfig',
+      'domain_theme_switch.settings',
     ];
   }
 
@@ -36,7 +36,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('domain_theme_switch.DomainThemeSwitchConfig');
+    $config = $this->config('domain_theme_switch.settings');
     $themes = \Drupal::service('theme_handler')->listInfo();
     $themeNames = array('' => '--Select--');
     foreach ($themes as $key => $value) {
@@ -82,7 +82,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
     $all_domain = \Drupal::service('domain.loader')->loadOptionsList();
-    $config = $this->config('domain_theme_switch.DomainThemeSwitchConfig');
+    $config = $this->config('domain_theme_switch.settings');
     foreach ($all_domain as $domain_key => $domain_value) {
       $config->set($domain_key, $form_state->getValue($domain_key));
     }
