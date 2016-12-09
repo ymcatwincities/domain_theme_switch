@@ -4,6 +4,7 @@ namespace Drupal\domain_theme_switch\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Url;
 use Drupal\domain\DomainLoader;
@@ -23,21 +24,30 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   protected $domainLoader;
 
   /**
-   * 
+   * Construct function.
+   *
    * @param DomainLoader $domain_loader
+   *   Load the domain records.
    */
-  public function __construct(DomainLoader $domain_loader
+  public function __construct(ConfigFactoryInterface $config_factory,
+      DomainLoader $domain_loader
   ) {
+    parent::__construct($config_factory);
     $this->domainLoader = $domain_loader;
   }
 
   /**
-   * 
+   * Create function return static domain loader configuration.
+   *
    * @param ContainerInterface $container
+   *   Load the ContainerInterface.
+   *
    * @return \static
+   *   return domain loader configuration.
    */
   public static function create(ContainerInterface $container) {
     return new static(
+        $container->get('config.factory'),
         $container->get('domain.loader')
     );
   }
@@ -77,18 +87,24 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
       $hostname = $domain->get('name');
       $form['domain' . $domainid] = array(
         '#type' => 'fieldset',
-        '#title' => t('Select Theme for @domain_name', array('@domain_name' => $hostname))
+        '#title' => t('Select Theme for @domain_name', array(
+          '@domain_name' => $hostname
+        ))
       );
       $form['domain' . $domainid][$domainid] = [
         '#type' => 'select',
-        '#title' => t(''),
         '#options' => $themeNames,
         '#default_value' => $config->get($domainid),
       ];
     }
     if (count($domains) === 0) {
       $form['domain_theme_switch_message'] = array(
-        '#markup' => t('We did not find any domain records please @link to create the domain.', array('@link' => \Drupal::l(t('click here'), Url::fromRoute('domain.admin')))),
+        '#markup' => t('We did not find any domain records
+         please @link to create the domain.', array(
+          '@link' => \Drupal::l(t('click here'),
+              Url::fromRoute('domain.admin'))
+            )
+        ),
       );
       return $form;
     }
@@ -103,18 +119,21 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    * @param FormStateInterface $form_state
    *   Formstate for validate.
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
+  public function validateForm(array &$form,
+      FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form,
+      FormStateInterface $form_state
+    ) {
     parent::submitForm($form, $form_state);
-    $all_domain = \Drupal::service('domain.loader')->loadOptionsList();
+    $domains = \Drupal::service('domain.loader')->loadOptionsList();
     $config = $this->config('domain_theme_switch.settings');
-    foreach ($all_domain as $domain_key => $domain_value) {
+    foreach ($domains as $domain_key => $domain) {
       $config->set($domain_key, $form_state->getValue($domain_key));
     }
     $config->save();
