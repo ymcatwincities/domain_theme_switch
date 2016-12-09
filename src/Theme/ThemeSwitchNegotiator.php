@@ -26,21 +26,12 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
   public function applies(RouteMatchInterface $route_match) {
     $switch_theme = TRUE;
     $route = \Drupal::routeMatch()->getRouteObject();
+
     $is_admin_route = \Drupal::service('router.admin_context')->isAdminRoute($route);
-    $current_user = \Drupal::currentUser();
-    $user_roles = $current_user->getRoles();
-    $has_admin_role = FALSE;
-    if (in_array("administrator", $user_roles)) {
-      $has_admin_role = TRUE;
-    }
-    if ($is_admin_route === TRUE && $has_admin_role === TRUE) {
+    $hasAdminPerm = \Drupal::currentUser()->hasPermission('administer permissions');
+
+    if ($is_admin_route === TRUE && $hasAdminPerm === TRUE) {
       $switch_theme = FALSE;
-    }
-    $negotiator = \Drupal::service('domain.negotiator');
-    $domain = $negotiator->getActiveDomain();
-    if ($domain != NULL) {
-      $config = \Drupal::config('domain_theme_switch.settings');
-      $this->theme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id()) : NULL;
     }
     return $switch_theme;
   }
@@ -56,7 +47,12 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    *   default one, should be used instead.
    */
   public function determineActiveTheme(RouteMatchInterface $route_match) {
-    return $this->theme;
+    $domain = \Drupal::service('domain.negotiator')->getActiveDomain();
+    if ($domain != NULL) {
+      $config = \Drupal::config('domain_theme_switch.settings');
+      $this->theme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id()) : NULL;
+    }
+    return ($this->theme !== NULL) ? $this->theme : NULL;
   }
 
 }

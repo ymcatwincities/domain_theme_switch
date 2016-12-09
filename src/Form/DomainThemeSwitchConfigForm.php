@@ -4,7 +4,9 @@ namespace Drupal\domain_theme_switch\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Url;
+use Drupal\domain\DomainLoader;
 
 /**
  * Class DomainThemeSwitchConfigForm.
@@ -12,6 +14,33 @@ use Drupal\Core\Url;
  * @package Drupal\domain_theme_switch\Form
  */
 class DomainThemeSwitchConfigForm extends ConfigFormBase {
+
+  /**
+   * Drupal\domain\DomainLoader definition.
+   *
+   * @var \Drupal\domain\DomainLoader
+   */
+  protected $domainLoader;
+
+  /**
+   * 
+   * @param DomainLoader $domain_loader
+   */
+  public function __construct(DomainLoader $domain_loader
+  ) {
+    $this->domainLoader = $domain_loader;
+  }
+
+  /**
+   * 
+   * @param ContainerInterface $container
+   * @return \static
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+        $container->get('domain.loader')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -42,20 +71,22 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
     foreach ($themes as $key => $value) {
       $themeNames[$key] = $key;
     }
-    $all_domain = \Drupal::service('domain.loader')->loadOptionsList();
-    foreach ($all_domain as $key => $value) {
-      $form['domain' . $key] = array(
+    $domains = $this->domainLoader->loadMultipleSorted();
+    foreach ($domains as $domain) {
+      $domainid = $domain->id();
+      $hostname = $domain->get('name');
+      $form['domain' . $domainid] = array(
         '#type' => 'fieldset',
-        '#title' => t('Select Theme for @domain_name', array('@domain_name' => $value))
+        '#title' => t('Select Theme for @domain_name', array('@domain_name' => $hostname))
       );
-      $form['domain' . $key][$key] = [
+      $form['domain' . $domainid][$domainid] = [
         '#type' => 'select',
         '#title' => t(''),
         '#options' => $themeNames,
-        '#default_value' => $config->get($key),
+        '#default_value' => $config->get($domainid),
       ];
     }
-    if (count($all_domain) === 0) {
+    if (count($domains) === 0) {
       $form['domain_theme_switch_message'] = array(
         '#markup' => t('We did not find any domain records please @link to create the domain.', array('@link' => \Drupal::l(t('click here'), Url::fromRoute('domain.admin')))),
       );
