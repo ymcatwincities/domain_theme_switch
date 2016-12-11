@@ -10,7 +10,12 @@ use Drupal\Core\Theme\ThemeNegotiatorInterface;
  */
 class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
 
-  // Protected theme variable to set the default theme if no theme is selected.
+  /**
+   * Protected theme variable to set the default theme againt the domain.
+   *
+   * @var string
+   *   Return theme name for the curret domain.
+   */
   protected $theme = NULL;
 
   /**
@@ -48,7 +53,7 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    */
   public function determineActiveTheme(RouteMatchInterface $route_match) {
     $domain = \Drupal::service('domain.negotiator')->getActiveDomain();
-    if ($domain != NULL) {
+    if ($domain !== NULL) {
       $config = \Drupal::config('domain_theme_switch.settings');
       $this->theme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id()) : NULL;
     }

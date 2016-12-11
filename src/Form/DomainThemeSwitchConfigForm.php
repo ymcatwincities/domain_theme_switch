@@ -6,6 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Url;
 use Drupal\domain\DomainLoader;
 
@@ -24,16 +25,25 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   protected $domainLoader;
 
   /**
+   * The theme handler.
+   *
+   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   */
+  protected $themeHandler;
+
+  /**
    * Construct function.
    *
    * @param DomainLoader $domain_loader
    *   Load the domain records.
    */
   public function __construct(ConfigFactoryInterface $config_factory,
-      DomainLoader $domain_loader
+      DomainLoader $domain_loader,
+      ThemeHandlerInterface $theme_handler
   ) {
     parent::__construct($config_factory);
     $this->domainLoader = $domain_loader;
+    $this->themeHandler = $theme_handler;
   }
 
   /**
@@ -48,7 +58,8 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
         $container->get('config.factory'),
-        $container->get('domain.loader')
+        $container->get('domain.loader'),
+        $container->get('theme_handler')
     );
   }
 
@@ -70,38 +81,39 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   public function getFormId() {
     return 'domain_theme_switch_config_form';
   }
+  
+  public function getThemeList(){
+  $themeName = array_keys($this->themeHandler->listInfo());
+  return array_combine($themeName, $themeName);
+  }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('domain_theme_switch.settings');
-    $themes = \Drupal::service('theme_handler')->listInfo();
-    $themeNames = array('' => '--Select--');
-    foreach ($themes as $key => $value) {
-      $themeNames[$key] = $key;
-    }
+    $themeNames = array_merge(array('' => '--Select--'), $this->getThemeList());
     $domains = $this->domainLoader->loadMultipleSorted();
     foreach ($domains as $domain) {
-      $domainid = $domain->id();
+      $domainId = $domain->id();
       $hostname = $domain->get('name');
-      $form['domain' . $domainid] = array(
+      $form['domain' . $domainId] = array(
         '#type' => 'fieldset',
-        '#title' => t('Select Theme for @domain_name', array(
+        '#title' => $this->t('Select Theme for @domain_name', array(
           '@domain_name' => $hostname
         ))
       );
-      $form['domain' . $domainid][$domainid] = [
+      $form['domain' . $domainId][$domainId] = [
         '#type' => 'select',
         '#options' => $themeNames,
-        '#default_value' => $config->get($domainid),
+        '#default_value' => $config->get($domainId),
       ];
     }
     if (count($domains) === 0) {
       $form['domain_theme_switch_message'] = array(
         '#markup' => t('We did not find any domain records
          please @link to create the domain.', array(
-          '@link' => \Drupal::l(t('click here'),
+          '@link' => $this->l($this->t('click here'),
               Url::fromRoute('domain.admin'))
             )
         ),
@@ -131,7 +143,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
       FormStateInterface $form_state
     ) {
     parent::submitForm($form, $form_state);
-    $domains = \Drupal::service('domain.loader')->loadOptionsList();
+    $domains = $this->domainLoader->loadMultipleSorted();
     $config = $this->config('domain_theme_switch.settings');
     foreach ($domains as $domain_key => $domain) {
       $config->set($domain_key, $form_state->getValue($domain_key));
