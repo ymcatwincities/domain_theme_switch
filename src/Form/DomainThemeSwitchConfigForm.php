@@ -105,12 +105,10 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
     foreach ($domains as $domain) {
       $domainId = $domain->id();
       $hostname = $domain->get('name');
-      $form['domain' . $domainId] = array(
+      $form['domain' . $domainId] = [
         '#type' => 'fieldset',
-        '#title' => $this->t('Select Theme for @domain_name', array(
-          '@domain_name' => $hostname
-        ))
-      );
+        '#title' => $this->t('Select Theme for @domain', ['@domain' => $hostname]),
+      ];
       $form['domain' . $domainId][$domainId] = [
         '#type' => 'select',
         '#options' => $themeNames,
@@ -118,14 +116,10 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
       ];
     }
     if (count($domains) === 0) {
-      $form['domain_theme_switch_message'] = array(
-        '#markup' => $this->t('We did not find any domain records
-         please @link to create the domain.', array(
-          '@link' => $this->l($this->t('click here'),
-              Url::fromRoute('domain.admin'))
-            )
-        ),
-      );
+      $form['domain_theme_switch_message'] = [
+        '#markup' => $this->t('Zero domain records found. Please @link to create the domain.',
+            ['@link' => $this->l($this->t('click here'), Url::fromRoute('domain.admin'))]),
+      ];
       return $form;
     }
     return parent::buildForm($form, $form_state);
@@ -153,8 +147,9 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
     parent::submitForm($form, $form_state);
     $domains = $this->domainLoader->loadMultipleSorted();
     $config = $this->config('domain_theme_switch.settings');
-    foreach ($domains as $domain_key => $domain) {
-      $config->set($domain_key, $form_state->getValue($domain_key));
+    foreach ($domains as $domain) {
+      $domainId = $domain->id();
+      $config->set($domainId, $form_state->getValue($domainId));
     }
     $config->save();
   }
