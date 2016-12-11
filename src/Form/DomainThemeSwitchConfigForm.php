@@ -81,10 +81,16 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   public function getFormId() {
     return 'domain_theme_switch_config_form';
   }
-  
-  public function getThemeList(){
-  $themeName = array_keys($this->themeHandler->listInfo());
-  return array_combine($themeName, $themeName);
+
+  /**
+   * Function to get the list of installed themes.
+   *
+   * @return type array.
+   *   List of theme available.
+   */
+  public function getThemeList() {
+    $themeName = array_keys($this->themeHandler->listInfo());
+    return array_combine($themeName, $themeName);
   }
 
   /**
@@ -92,7 +98,9 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('domain_theme_switch.settings');
-    $themeNames = array_merge(array('' => '--Select--'), $this->getThemeList());
+    $themeNames = array_merge(
+        array('' => '--Select--'),
+        $this->getThemeList());
     $domains = $this->domainLoader->loadMultipleSorted();
     foreach ($domains as $domain) {
       $domainId = $domain->id();
@@ -111,7 +119,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
     }
     if (count($domains) === 0) {
       $form['domain_theme_switch_message'] = array(
-        '#markup' => t('We did not find any domain records
+        '#markup' => $this->t('We did not find any domain records
          please @link to create the domain.', array(
           '@link' => $this->l($this->t('click here'),
               Url::fromRoute('domain.admin'))
