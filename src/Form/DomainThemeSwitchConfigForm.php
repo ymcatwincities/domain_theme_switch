@@ -85,7 +85,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   /**
    * Function to get the list of installed themes.
    *
-   * @return type array.
+   * @return array list of themes.
    *   List of theme available.
    */
   public function getThemeList() {
