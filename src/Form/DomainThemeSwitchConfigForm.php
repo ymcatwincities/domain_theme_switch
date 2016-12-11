@@ -85,8 +85,8 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   /**
    * Function to get the list of installed themes.
    *
-   * @return array list of themes.
-   *   List of theme available.
+   * @return array
+   *   The complete theme registry data array.
    */
   public function getThemeList() {
     $themeName = array_keys($this->themeHandler->listInfo());
