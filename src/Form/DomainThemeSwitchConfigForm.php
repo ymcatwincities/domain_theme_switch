@@ -135,9 +135,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   Formstate for validate.
    */
-  public function validateForm(array &$form,
-      FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
+  public function validateForm(array &$form, FormStateInterface $form_state) {
   }
 
   /**
