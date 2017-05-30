@@ -107,7 +107,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
       $hostname = $domain->get('name');
       $form['domain' . $domainId] = [
         '#type' => 'fieldset',
-        '#title' => $this->t('Select Theme for @domain', ['@domain' => $hostname]),
+        '#title' => $this->t('Select Theme for "@domain"', ['@domain' => $hostname]),
       ];
       $form['domain' . $domainId][$domainId] = [
         '#type' => 'select',
