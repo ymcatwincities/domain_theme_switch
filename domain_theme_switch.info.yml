@@ -1,8 +1,8 @@
-name: Domain Theme switch
+name: 'Domain Theme switch'
 description: 'Theme switch for different domains'
 type: module
 package: Domain
 core: 8.x
+configure: domain_theme_switch.settings
 dependencies:
   - domain
-configure: domain_theme_switch.settings
