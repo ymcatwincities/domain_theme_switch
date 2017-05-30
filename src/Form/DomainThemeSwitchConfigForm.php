@@ -34,8 +34,10 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   /**
    * Construct function.
    *
-   * @param DomainLoader $domain_loader
-   *   Load the domain records.
+   * @param \Drupal\domain\DomainLoaderInterface $domain_loader
+   *   The domain loader.
+   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   *   The theme handler.
    */
   public function __construct(ConfigFactoryInterface $config_factory,
       DomainLoader $domain_loader,
@@ -49,7 +51,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   /**
    * Create function return static domain loader configuration.
    *
-   * @param ContainerInterface $container
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   Load the ContainerInterface.
    *
    * @return \static
@@ -98,9 +100,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('domain_theme_switch.settings');
-    $themeNames = array_merge(
-        array('' => '--Select--'),
-        $this->getThemeList());
+    $themeNames = array_merge(['' => '--Select--'], $this->getThemeList());
     $domains = $this->domainLoader->loadMultipleSorted();
     foreach ($domains as $domain) {
       $domainId = $domain->id();
@@ -130,7 +130,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    *
    * @param array $form
    *   Form items.
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   Formstate for validate.
    */
   public function validateForm(array &$form,
