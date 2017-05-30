@@ -34,7 +34,9 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   /**
    * Construct function.
    *
-   * @param \Drupal\domain\DomainLoaderInterface $domain_loader
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory load.
+   * @param \Drupal\domain\DomainLoader $domain_loader
    *   The domain loader.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
