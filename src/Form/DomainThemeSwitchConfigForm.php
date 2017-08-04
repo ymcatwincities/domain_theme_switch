@@ -41,9 +41,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory,
-      DomainLoader $domain_loader,
-      ThemeHandlerInterface $theme_handler
+  public function __construct(ConfigFactoryInterface $config_factory, DomainLoader $domain_loader, ThemeHandlerInterface $theme_handler
   ) {
     parent::__construct($config_factory);
     $this->domainLoader = $domain_loader;
@@ -61,9 +59,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-        $container->get('config.factory'),
-        $container->get('domain.loader'),
-        $container->get('theme_handler')
+        $container->get('config.factory'), $container->get('domain.loader'), $container->get('theme_handler')
     );
   }
 
@@ -102,25 +98,38 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('domain_theme_switch.settings');
-    $themeNames = array_merge(['' => '--Select--'], $this->getThemeList());
+    $defaultSiteTheme = $this->config('system.theme')->get('default');
+    $defaultAdminTheme = $this->config('system.theme')->get('admin');
+
+    $themeNames = $this->getThemeList();
     $domains = $this->domainLoader->loadMultipleSorted();
     foreach ($domains as $domain) {
       $domainId = $domain->id();
       $hostname = $domain->get('name');
-      $form['domain' . $domainId] = [
+      $form[$domainId] = [
         '#type' => 'fieldset',
         '#title' => $this->t('Select Theme for "@domain"', ['@domain' => $hostname]),
       ];
-      $form['domain' . $domainId][$domainId] = [
+      $form[$domainId][$domainId . '_site'] = [
+        '#title' => $this->t('Site theme for domain'),
+        '#type' => 'radios',
+        '#options' => $themeNames,
+        '#default_value' => (NULL !== $config->get($domainId . '_site')) ? $config->get($domainId . '_site') : $defaultSiteTheme,
+      ];
+      $form[$domainId][$domainId . '_admin'] = [
+        '#title' => $this->t('Admin theme for domain'),
+        '#suffix' => $this->t('Change permission to allow domain admin theme @link.', [
+          '@link' => $this->l($this->t('change permission'),
+              Url::fromRoute('user.admin_permissions', [], ['fragment' => 'module-domain_theme_switch'])),
+        ]),
         '#type' => 'select',
         '#options' => $themeNames,
-        '#default_value' => $config->get($domainId),
+        '#default_value' => (NULL !== $config->get($domainId . '_admin')) ? $config->get($domainId . '_admin') : $defaultAdminTheme,
       ];
     }
     if (count($domains) === 0) {
       $form['domain_theme_switch_message'] = [
-        '#markup' => $this->t('Zero domain records found. Please @link to create the domain.',
-            ['@link' => $this->l($this->t('click here'), Url::fromRoute('domain.admin'))]),
+        '#markup' => $this->t('Zero domain records found. Please @link to create the domain.', ['@link' => $this->l($this->t('click here'), Url::fromRoute('domain.admin'))]),
       ];
       return $form;
     }
@@ -141,15 +150,14 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form,
-      FormStateInterface $form_state
-    ) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
     $domains = $this->domainLoader->loadMultipleSorted();
     $config = $this->config('domain_theme_switch.settings');
     foreach ($domains as $domain) {
       $domainId = $domain->id();
-      $config->set($domainId, $form_state->getValue($domainId));
+      $config->set($domainId . '_site', $form_state->getValue($domainId . '_site'));
+      $config->set($domainId . '_admin', $form_state->getValue($domainId . '_admin'));
     }
     $config->save();
   }

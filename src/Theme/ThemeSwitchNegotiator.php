@@ -20,7 +20,15 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    * @var string
    *   Return theme name for the curret domain.
    */
-  protected $theme = NULL;
+  protected $dafaultTheme = NULL;
+
+  /**
+   * Protected theme variable to set the default theme againt the domain admin pages.
+   *
+   * @var string
+   *   Return theme name for the curret domain.
+   */
+  protected $adminTheme = NULL;
 
 
   /**
@@ -84,14 +92,18 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    *   decide.
    */
   public function applies(RouteMatchInterface $route_match) {
-    $switch_theme   = TRUE;
-    $is_admin_route = $this->adminContext->isAdminRoute($route_match->getRouteObject());
-    $hasAdminPerm   = $this->currentUser->hasPermission('administer permissions');
-
-    if ($is_admin_route === TRUE && $hasAdminPerm === TRUE) {
-      $switch_theme = FALSE;
+    $domain = $this->negotiator->getActiveDomain();
+    $config = $this->configFactory->get('domain_theme_switch.settings');
+    if ($domain !== NULL) {
+      $this->defaultTheme = $this->adminTheme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id() . '_site') : NULL;
+      $is_admin_route = $this->adminContext->isAdminRoute($route_match->getRouteObject());
+      $hasAdminPerm = $this->currentUser->hasPermission('domain administration theme');
+      if ($hasAdminPerm === TRUE) {
+        $this->adminTheme = $config->get($domain->id() . '_admin');
+      }
+      return TRUE;
     }
-    return $switch_theme;
+    return FALSE;
   }
 
   /**
@@ -105,12 +117,20 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    *   default one, should be used instead.
    */
   public function determineActiveTheme(RouteMatchInterface $route_match) {
-    $domain = $this->negotiator->getActiveDomain();
-    if ($domain !== NULL) {
-      $config = $this->configFactory->get('domain_theme_switch.settings');
-      $this->theme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id()) : NULL;
-    }
-    return ($this->theme !== NULL) ? $this->theme : NULL;
+    return ($this->isAdminRouteUrl($route_match) === FALSE) ? $this->defaultTheme : $this->adminTheme;
+  }
+
+  /**
+   * Function check is admin route page.
+   *
+   * @param RouteMatchInterface $route_match
+   *   RouteMatchInterface Object.
+   *
+   * @return boolen
+   *   True if route is admin path.
+   */
+  private function isAdminRouteUrl(RouteMatchInterface $route_match) {
+    return $this->adminContext->isAdminRoute($route_match->getRouteObject());
   }
 
 }
