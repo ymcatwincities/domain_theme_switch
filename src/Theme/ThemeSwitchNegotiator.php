@@ -23,10 +23,10 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
   protected $defaultTheme = NULL;
 
   /**
-   * Protected theme variable to set the default theme againt the domain admin pages.
+   * Protected theme variable to set default theme against domain admin pages.
    *
    * @var string
-   *   Return theme name for the curret domain.
+   *   Return theme name for the current domain.
    */
   protected $adminTheme = NULL;
 
@@ -128,10 +128,10 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
   /**
    * Function check is admin route page.
    *
-   * @param RouteMatchInterface $route_match
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   RouteMatchInterface Object.
    *
-   * @return boolen
+   * @return bool
    *   True if route is admin path.
    */
   private function isAdminRouteUrl(RouteMatchInterface $route_match) {
