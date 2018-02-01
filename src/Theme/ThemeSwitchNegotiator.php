@@ -20,7 +20,7 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    * @var string
    *   Return theme name for the curret domain.
    */
-  protected $dafaultTheme = NULL;
+  protected $defaultTheme = NULL;
 
   /**
    * Protected theme variable to set the default theme againt the domain admin pages.
@@ -92,18 +92,23 @@ class ThemeSwitchNegotiator implements ThemeNegotiatorInterface {
    *   decide.
    */
   public function applies(RouteMatchInterface $route_match) {
-    $domain = $this->negotiator->getActiveDomain();
-    $config = $this->configFactory->get('domain_theme_switch.settings');
-    if ($domain !== NULL) {
-      $this->defaultTheme = $this->adminTheme = ($config->get($domain->id()) !== NULL) ? $config->get($domain->id() . '_site') : NULL;
-      $is_admin_route = $this->adminContext->isAdminRoute($route_match->getRouteObject());
-      $hasAdminPerm = $this->currentUser->hasPermission('domain administration theme');
-      if ($hasAdminPerm === TRUE) {
-        $this->adminTheme = $config->get($domain->id() . '_admin');
-      }
-      return TRUE;
+    if (!($domain = $this->negotiator->getActiveDomain())) {
+      // Unable to determine active domain.
+      return FALSE;
     }
-    return FALSE;
+
+    $config = $this->configFactory->get('domain_theme_switch.settings');
+
+    // Admin pages uses same theme by default.
+    $this->defaultTheme = $this->adminTheme = $config->get($domain->id() . '_site');
+
+    // Allow overriding admin theme for users having 'Use domain admin theme'
+    // permission.
+    if ($this->currentUser->hasPermission('domain administration theme')) {
+      $this->adminTheme = $config->get($domain->id() . '_admin');
+    }
+
+    return TRUE;
   }
 
   /**
