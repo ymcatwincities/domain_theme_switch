@@ -112,7 +112,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
       ];
       $form[$domainId][$domainId . '_site'] = [
         '#title' => $this->t('Site theme for domain'),
-        '#type' => 'radios',
+        '#type' => 'select',
         '#options' => $themeNames,
         '#default_value' => (NULL !== $config->get($domainId . '_site')) ? $config->get($domainId . '_site') : $defaultSiteTheme,
       ];
