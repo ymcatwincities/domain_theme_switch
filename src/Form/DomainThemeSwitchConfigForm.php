@@ -90,8 +90,11 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    *   The complete theme registry data array.
    */
   public function getThemeList() {
-    $themeName = array_keys($this->themeHandler->listInfo());
-    return array_combine($themeName, $themeName);
+    $themeName = [];
+    foreach ($this->themeHandler->listInfo() as $key => $value){
+      $themeName[$key] = $value->info['name'];
+    }
+    return $themeName;
   }
 
   /**
