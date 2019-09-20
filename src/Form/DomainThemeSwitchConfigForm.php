@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Url;
 use Drupal\domain\DomainLoader;
+use Drupal\Core\Link;
 
 /**
  * Class DomainThemeSwitchConfigForm.
@@ -54,7 +55,7 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    *   Load the ContainerInterface.
    *
-   * @return \static
+   * @return static
    *   return domain loader configuration.
    */
   public static function create(ContainerInterface $container) {
@@ -119,8 +120,8 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
       $form[$domainId][$domainId . '_admin'] = [
         '#title' => $this->t('Admin theme for domain'),
         '#suffix' => $this->t('Change permission to allow domain admin theme @link.', [
-          '@link' => $this->l($this->t('change permission'),
-              Url::fromRoute('user.admin_permissions', [], ['fragment' => 'module-domain_theme_switch'])),
+          '@link' => Link::fromTextAndUrl($this->t('change permission'),
+              Url::fromRoute('user.admin_permissions', [], ['fragment' => 'module-domain_theme_switch']))->toString(),
         ]),
         '#type' => 'select',
         '#options' => $themeNames,
@@ -129,7 +130,9 @@ class DomainThemeSwitchConfigForm extends ConfigFormBase {
     }
     if (count($domains) === 0) {
       $form['domain_theme_switch_message'] = [
-        '#markup' => $this->t('Zero domain records found. Please @link to create the domain.', ['@link' => $this->l($this->t('click here'), Url::fromRoute('domain.admin'))]),
+        '#markup' => $this->t('Zero domain records found. Please @link to create the domain.', [
+          '@link' => Link::fromTextAndUrl($this->t('click here'), Url::fromRoute('domain.admin'))->toString(),
+        ]),
       ];
       return $form;
     }
