@@ -1,0 +1,12 @@
+{
+  "name": "ymcatwincities/domain_theme_switch",
+  "description": "A Drupal domain_theme_switch module",
+  "type": "drupal-module",
+  "homepage": "https://drupal.org/project/domain_theme_switch",
+  "support": {
+    "issues": "https://drupal.org/project/issues/domain_theme_switch",
+    "source": "https://cgit.drupalcode.org/domain_theme_switch"
+  },
+  "license": "GPL-2.0-or-later",
+  "minimum-stability": "dev"
+}
